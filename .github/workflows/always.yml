@@ -112,4 +112,4 @@ jobs:
       - name: dotnet restore
         run: dotnet restore ${{ env.DOTNET_PROJECT }}
       - name: dotnet build
-        run: dotnet build ${{ env.DOTNET_PROJECT }} --no-restore --configuration ${{ matrix.configuration }}
+        run: dotnet build ${{ env.DOTNET_PROJECT }} --no-restore --configuration ${{ env.DOTNET_CONFIGURATION }}
