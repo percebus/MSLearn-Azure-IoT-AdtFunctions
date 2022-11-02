@@ -1,0 +1,72 @@
+name: Verification
+on:
+  push:
+  schedule:
+    - cron: '0 0 * * *'
+
+env:
+  DOTNET_VERSION: '3.1.X'
+
+jobs:
+
+  # SRC https://medium.com/attest-product-and-technology/adding-a-unique-github-build-identifier-7aa2e83cadca
+  id:
+    name: Build Id
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'id'
+        id: id
+        run: echo "BUILD_ID=$(date +%s)" >> $GITHUB_ENV
+      - name: echo
+        run: echo ${{ env.BUILD_ID }}
+
+
+  build:
+    needs: id
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: ls
+        run: ls -la
+
+      - uses: actions/checkout@v3
+      - name: setup .NET:${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: dotnet restore
+        run: dotnet restore
+      - name: dotnet build
+        run: dotnet build --configuration Debug --no-restore
+
+  builds:
+#   if: github.ref == 'refs/heads/main'
+    needs: id
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        dotnet: ['3.X', '5.X']
+        configuration: ['Debug', 'Release']
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
+    name: Build @ .NET:${{ matrix.dotnet }}:${{ matrix.configuration }}@${{ matrix.os }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: ls
+        run: ls -la
+
+      - name: setup .NET:${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: dotnet restore
+        run: dotnet restore
+      - name: dotnet build
+        run: dotnet build --configuration ${{ matrix.configuration }} --no-restore
