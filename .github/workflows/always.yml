@@ -45,7 +45,7 @@ jobs:
         run: dotnet build ${DOTNET_PROJECT} --no-restore --configuration ${{ env.DOTNET_CONFIGURATION }}
 
   builds:
-    if: github.ref == 'refs/heads/main'
+#   if: github.ref == 'refs/heads/main'
     needs: id
     strategy:
       fail-fast: false
