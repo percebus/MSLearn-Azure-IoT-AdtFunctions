@@ -22,12 +22,17 @@ jobs:
         run: echo ${{ env.BUILD_ID }}
 
 
-  build-debug:
+  build:
     needs: id
     name: Build
     runs-on: ubuntu-latest
-    env:
-      DOTNET_CONFIGURATION: Debug
+    strategy:
+      fail-fast: true
+      max-parallel: 2
+      matrix:
+        configuration:
+          - Debug
+          - Release
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -42,50 +47,18 @@ jobs:
       - name: dotnet restore
         run: dotnet restore ${{ env.DOTNET_PROJECT }}
       - name: dotnet build
-        run: dotnet build ${{ env.DOTNET_PROJECT }} --no-restore --configuration ${{ env.DOTNET_CONFIGURATION }}
+        run: dotnet build ${{ env.DOTNET_PROJECT }} --no-restore --configuration ${{ matrix.configuration }}
 
       - name: bin.zip
         uses: actions/upload-artifact@v3
         with:
-          name: bin
-          path: ${{ env.DOTNET_PROJECT }}/bin/${{ env.DOTNET_CONFIGURATION }}
+          name: ${{ matrix.configuration }}
+          path: ${{ env.DOTNET_PROJECT }}/bin/${{ matrix.configuration }}/netcoreapp3.1
 
 
-  builds-debug:
-    if: github.ref == 'refs/heads/main'
-    needs: id
-    env:
-      DOTNET_CONFIGURATION: Debug
-    strategy:
-      fail-fast: false
-      max-parallel: 6
-      matrix:
-        dotnet: ['3.X', '5.X']
-        os:
-          - ubuntu-latest
-          - macOS-latest
-          - windows-latest
-    runs-on: ${{ matrix.os }}
-    name: Build:Debug @ .NET:${{ matrix.dotnet }}@${{ matrix.os }}
-    steps:
-      - name: checkout
-        uses: actions/checkout@v3
-      - name: ls
-        run: ls # windows does not support -la
-
-      - name: setup .NET:${{ env.DOTNET_VERSION }}
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-      - name: dotnet restore
-        run: dotnet restore ${{ env.DOTNET_PROJECT }}
-      - name: dotnet build
-        run: dotnet build ${{ env.DOTNET_PROJECT }} --no-restore --configuration ${{ env.DOTNET_CONFIGURATION }}
-
-
-  builds-release:
-    if: github.ref == 'refs/heads/main'
-    needs: builds-debug
+  builds:
+#   if: github.ref == 'refs/heads/main'
+    needs: build
     env:
       DOTNET_CONFIGURATION: Release
     strategy:
