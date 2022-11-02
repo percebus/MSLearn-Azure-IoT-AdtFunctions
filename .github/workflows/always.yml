@@ -6,6 +6,7 @@ on:
 
 env:
   DOTNET_VERSION: '3.1.X'
+  DOTNET_PROJECT: ./Contoso.AdtFunctions
 
 jobs:
 
@@ -25,6 +26,8 @@ jobs:
     needs: id
     name: Build
     runs-on: ubuntu-latest
+    env:
+      DOTNET_CONFIGURATION: Debug
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -37,12 +40,12 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - name: dotnet restore
-        run: dotnet restore
+        run: dotnet restore ${DOTNET_PROJECT}
       - name: dotnet build
-        run: dotnet build --configuration Debug --no-restore
+        run: dotnet build ${DOTNET_PROJECT} --no-restore --configuration ${{ env.DOTNET_CONFIGURATION }}
 
   builds:
-#   if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     needs: id
     strategy:
       fail-fast: false
@@ -67,6 +70,6 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - name: dotnet restore
-        run: dotnet restore
+        run: dotnet restore ${DOTNET_PROJECT}
       - name: dotnet build
-        run: dotnet build --configuration ${{ matrix.configuration }} --no-restore
+        run: dotnet build ${DOTNET_PROJECT} --no-restore --configuration ${{ matrix.configuration }}
