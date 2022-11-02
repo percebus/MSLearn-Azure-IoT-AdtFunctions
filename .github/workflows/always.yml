@@ -24,7 +24,6 @@ jobs:
 
   build:
     needs: id
-    name: Build
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -33,6 +32,7 @@ jobs:
         configuration:
           - Debug
           - Release
+    name: Build:${{ matrix.configuration }}
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -57,8 +57,8 @@ jobs:
 
 
   builds:
-#   if: github.ref == 'refs/heads/main'
-    needs: build
+    if: github.ref == 'refs/heads/main'
+    needs: id
     env:
       DOTNET_CONFIGURATION: Release
     strategy:
