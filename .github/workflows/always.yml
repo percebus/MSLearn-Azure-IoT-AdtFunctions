@@ -44,9 +44,15 @@ jobs:
       - name: dotnet build
         run: dotnet build ${{ env.DOTNET_PROJECT }} --no-restore --configuration ${{ env.DOTNET_CONFIGURATION }}
 
+      - name: bin.zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: bin
+          path: ${{ env.DOTNET_PROJECT }}/${{ env.DOTNET_CONFIGURATION }}/bin
+
 
   builds-debug:
-#   if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     needs: id
     env:
       DOTNET_CONFIGURATION: Debug
@@ -78,7 +84,7 @@ jobs:
 
 
   builds-release:
-#   if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     needs: builds-debug
     env:
       DOTNET_CONFIGURATION: Release
