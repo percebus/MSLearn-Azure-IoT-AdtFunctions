@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: bin
-          path: ${{ env.DOTNET_PROJECT }}/${{ env.DOTNET_CONFIGURATION }}/bin
+          path: ${{ env.DOTNET_PROJECT }}/bin/${{ env.DOTNET_CONFIGURATION }}
 
 
   builds-debug:
