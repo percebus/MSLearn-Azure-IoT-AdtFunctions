@@ -6,7 +6,7 @@ on:
 
 env:
   DOTNET_PROJECT: ./Contoso.AdtFunctions
-  DOTNET_VERSION: '6.x'
+  DOTNET_VERSION: '3.1.x'
   DOTNET_TARGET_FRAMEWORK: netcoreapp3.1
 
 jobs:
@@ -66,7 +66,10 @@ jobs:
       fail-fast: false
       max-parallel: 6
       matrix:
-        dotnet-version: ['3.X', '6.X']
+        dotnet-version:
+          - '3.x'
+#         - '5.x' # TODO? or XXX?
+          - '6.x'
         os:
           - ubuntu-latest
           - macOS-latest
